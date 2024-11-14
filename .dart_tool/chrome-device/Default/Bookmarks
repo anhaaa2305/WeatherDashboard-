@@ -1,0 +1,47 @@
+{
+   "checksum": "4153a7294e7d1a24fb933e05d5653557",
+   "roots": {
+      "bookmark_bar": {
+         "children": [  ],
+         "date_added": "13375925135135479",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Thanh Dấu trang",
+         "type": "folder"
+      },
+      "other": {
+         "children": [ {
+            "date_added": "13375925229988597",
+            "date_last_used": "0",
+            "guid": "884afb87-bd49-468a-994a-d59124d04c5d",
+            "id": "5",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": "Weather Dashboard",
+            "type": "url",
+            "url": "http://localhost:55904/"
+         } ],
+         "date_added": "13375925135135484",
+         "date_last_used": "0",
+         "date_modified": "13375925229988597",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "2",
+         "name": "Dấu trang Khác",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13375925135135486",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "3",
+         "name": "Dấu trang trên thiết bị di động",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}

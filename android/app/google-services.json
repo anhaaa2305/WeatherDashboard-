@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029173790499",
+    "project_id": "weatherdashboard-e6443",
+    "storage_bucket": "weatherdashboard-e6443.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029173790499:android:8f097eab16f0af4a272e96",
+        "android_client_info": {
+          "package_name": "com.haluuvananh.weather_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTmgPsuNl7FHYD27vkh1AXu2dsw5rqbmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
