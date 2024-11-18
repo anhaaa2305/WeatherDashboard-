@@ -1,47 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../consts/constants.dart';
 import '../providers/weather_provider.dart';
 import 'forecast_widget.dart';
 
-class HistoryGridWeathers extends StatelessWidget {
+class HistoryGridWeathers extends StatefulWidget {
   const HistoryGridWeathers(
       {super.key,
-      required this.city,
       this.crossAxisCount = 4,
       this.childAspectRatio = 1,
-      this.isInMain = true});
+      this.isInMain = true,
+      required this.city,
+      required this.dateTime});
 
   final int crossAxisCount;
   final double childAspectRatio;
   final bool isInMain;
   final String city;
+  final DateTime dateTime;
+
+  @override
+  State<HistoryGridWeathers> createState() => _HistoryGridWeathersState();
+}
+
+class _HistoryGridWeathersState extends State<HistoryGridWeathers> {
   @override
   Widget build(BuildContext context) {
     final weatherProvider = Provider.of<WeatherProvider>(context);
-    return weatherProvider.forecastDays.isEmpty
+    return weatherProvider.historyDays.isEmpty
         ? const Center(child: CircularProgressIndicator())
         : GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: isInMain && weatherProvider.forecastDays.length > 4
-                ? 4
-                : weatherProvider.forecastDays.length,
+            itemCount: weatherProvider.historyDays.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              childAspectRatio: childAspectRatio,
+              crossAxisCount: widget.crossAxisCount,
+              childAspectRatio: widget.childAspectRatio,
               crossAxisSpacing: defaultPadding,
               mainAxisSpacing: defaultPadding,
             ),
             itemBuilder: (context, index) {
-              final forecast = weatherProvider.forecastDays[index];
+              final historyDay = weatherProvider.historyDays[index];
+              DateTime castToDateTime = DateTime.parse(historyDay.time);
+              String formatTime = DateFormat('HH:mm').format(castToDateTime);
               return ForecastBox(
-                date: forecast.date,
-                temp: forecast.temperature,
-                wind: forecast.wind,
-                humidity: forecast.humidity,
-                icon: forecast.iconUrl,
+                date: formatTime,
+                temp: historyDay.temperature,
+                wind: historyDay.wind,
+                humidity: historyDay.humidity,
+                image: "https:${historyDay.iconUrl}",
               );
             },
           );

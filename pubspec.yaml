@@ -62,6 +62,8 @@ dependencies:
   permission_handler: ^11.3.1
   geocoding: ^3.0.0
   flutter_email_sender: ^6.0.3
+  cached_network_image: ^3.4.0
+  device_info_plus: ^10.1.2
 
 
 
@@ -89,6 +91,4 @@ flutter:
 
   assets:
     - images/
-    - images/cat/
-    - images/offers/
-    - images/landing/
+

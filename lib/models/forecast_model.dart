@@ -13,7 +13,6 @@ class ForecastDay {
     required this.iconUrl,
   });
 
-  // Phương thức để tạo ForecastDay từ JSON
   factory ForecastDay.fromJson(Map<String, dynamic> json) {
     return ForecastDay(
       date: json['date'],

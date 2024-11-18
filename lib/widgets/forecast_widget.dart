@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_dashboard/widgets/text_widget.dart';
 
@@ -6,14 +7,15 @@ class ForecastBox extends StatelessWidget {
   final String temp;
   final String wind;
   final String humidity;
-  final String icon;
+  final String image;
+
   const ForecastBox({
     super.key,
     required this.date,
     required this.temp,
     required this.wind,
     required this.humidity,
-    required this.icon,
+    required this.image,
   });
 
   @override
@@ -32,8 +34,15 @@ class ForecastBox extends StatelessWidget {
             color: Colors.white,
             isTitle: true,
           ),
-          const SizedBox(height: 16),
-          Image.network(icon), // Replace with relevant icon for each day
+          const SizedBox(height: 2),
+          CachedNetworkImage(
+            width: MediaQuery.of(context).size.width * 0.1,
+            height: MediaQuery.of(context).size.width * 0.1,
+            imageUrl: image,
+            // Replace with your image URL
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
           const SizedBox(height: 8),
           TextWidget(text: 'Temp: $temp', color: Colors.white),
           TextWidget(text: 'Wind: $wind', color: Colors.white),

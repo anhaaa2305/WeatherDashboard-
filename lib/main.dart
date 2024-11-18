@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -10,17 +13,27 @@ import 'controllers/MenuController.dart';
 import 'providers/dark_theme_provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyCgYaPjCDbO6Bs5wkdvC3Prr46MWQbD5Zc",
-      appId: "1:1029173790499:web:7800ca39c7a53095272e96",
-      messagingSenderId: "1029173790499",
-      projectId: "weatherdashboard-e6443",
-      storageBucket: "weatherdashboard-e6443.firebasestorage.app",
-    ),
-  );
-
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    try {
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Exception: $e");
+      }
+    }
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyCgYaPjCDbO6Bs5wkdvC3Prr46MWQbD5Zc",
+        appId: "1:1029173790499:web:7800ca39c7a53095272e96",
+        messagingSenderId: "1029173790499",
+        projectId: "weatherdashboard-e6443",
+        storageBucket: "weatherdashboard-e6443.firebasestorage.app",
+      ),
+    );
+  }
   runApp(const MyApp());
 }
 

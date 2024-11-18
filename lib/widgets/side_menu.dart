@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_dashboard/inner_screens/history_screens.dart';
+import 'package:weather_dashboard/inner_screens/subcribse_notification_screens.dart';
 import 'package:weather_dashboard/screens/dashboard_screen.dart';
 import 'package:weather_dashboard/widgets/text_widget.dart';
 
@@ -61,7 +62,8 @@ class _SideMenuState extends State<SideMenu> {
                       String locationName = _locationSearch.text.trim();
                       if (locationName.isNotEmpty) {
                         Provider.of<WeatherProvider>(context, listen: false)
-                            .fetchWeatherData(locationName);
+                            .fetchWeatherData(locationName, 4);
+                        Navigator.of(context).pop();
                       }
                       // Add your search action here
                     },
@@ -73,8 +75,7 @@ class _SideMenuState extends State<SideMenu> {
                     ),
                     child: const Text(
                       'Search',
-                      style: TextStyle(
-                          color: Colors.white), // Set text color to white
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -108,22 +109,20 @@ class _SideMenuState extends State<SideMenu> {
                   child: ElevatedButton(
                     onPressed: () async {
                       Provider.of<WeatherProvider>(context, listen: false)
-                          .fetchCurrentWeather();
+                          .fetchCurrentWeather(4);
+                      Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           Colors.grey, // Set background color to blue
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 18), // Adjust padding for height
+                      padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            4), // Match the TextField border radius
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     child: const Text(
                       'Use Current Location',
-                      style: TextStyle(
-                          color: Colors.white), // Set text color to white
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -150,6 +149,17 @@ class _SideMenuState extends State<SideMenu> {
                       builder: (context) => const HistoryScreen()));
             },
             icon: Icons.history,
+          ),
+          DrawerListTile(
+            title: "Subscribe to Notifications",
+            press: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const EmailSubscriptionScreen(),
+                ),
+              );
+            },
+            icon: Icons.notification_add,
           ),
           SwitchListTile(
               title: Text(
@@ -179,7 +189,6 @@ class _SideMenuState extends State<SideMenu> {
 class DrawerListTile extends StatelessWidget {
   const DrawerListTile({
     super.key,
-    // For selecting those three line once press "Command+D"
     required this.title,
     required this.press,
     required this.icon,

@@ -1,24 +1,30 @@
 import 'dart:convert';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import 'package:weather_dashboard/consts/constants.dart';
 
 import '../models/forecast_model.dart';
+import '../models/history_forecast_model.dart';
 
 class WeatherProvider extends ChangeNotifier {
-  String cityName = "Ho Chi Minh";
+  String cityName = "Ha Noi";
   String temperature = "";
   String wind = "";
   String humidity = "";
   String status = "";
   String time = "";
   String iconUrl = "";
-  String date = "";
-  final String apiKey = "d5fb044807804190b0d174225241211";
+  DateTime date = DateTime.now();
+
   List<ForecastDay> forecastDays = [];
+  List<HistoryModel> historyDays = [];
 
   Future<String> getCityFromCoordinates(
       double latitude, double longitude) async {
@@ -29,7 +35,7 @@ class WeatherProvider extends ChangeNotifier {
       if (placemarks.isNotEmpty) {
         // Get the city from the list of placemarks
         Placemark placemark = placemarks.first;
-        return placemark.locality ?? 'Unknown city'; // Return the city name
+        return placemark.locality ?? 'Da Nang';
       } else {
         return 'City not found';
       }
@@ -42,17 +48,11 @@ class WeatherProvider extends ChangeNotifier {
   }
 
   Future<Position> _getCurrentPosition() async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      throw Exception("Location permissions are denied");
-    }
-
     return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
   }
 
-  Future<void> fetchWeatherDataFromUrl(String url) async {
+  Future<void> fetchWeatherDataFromUrl(String url, int? day) async {
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -67,14 +67,13 @@ class WeatherProvider extends ChangeNotifier {
         status = data['current']['condition']['text'];
         iconUrl = data['current']['condition']['icon'];
         DateTime dateTime = DateTime.parse(data['location']['localtime']);
+        date = dateTime;
         time =
             "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
 
-        if (kDebugMode) {
-          print("City name: $cityName");
-        }
         // Fetch forecast data
-        forecastDays = await fetchWeatherForecast(cityName, 4);
+        forecastDays = await fetchWeatherForecast(cityName, day!);
+        historyDays = await fetchHistoryWeather(cityName, dateTime);
         notifyListeners();
       } else {
         if (kDebugMode) {
@@ -89,37 +88,37 @@ class WeatherProvider extends ChangeNotifier {
   }
 
 // Fetch current weather using current location
-  Future<void> fetchCurrentWeather() async {
+  Future<void> fetchCurrentWeather(int day) async {
     Position position = await _getCurrentPosition();
     String? city =
         await getCityFromCoordinates(position.latitude, position.longitude);
-    final url =
+    final urlCurrentWeather =
         'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$city&aqi=no';
     if (kDebugMode) {
-      print("Get URL From: $url");
+      print("Get urlCurrentWeather From: $urlCurrentWeather");
     }
-    await fetchWeatherDataFromUrl(url);
+    await fetchWeatherDataFromUrl(urlCurrentWeather, day);
   }
 
 // Fetch weather data for a given city
-  Future<void> fetchWeatherData(String city) async {
-    final url = 'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$city';
+  Future<void> fetchWeatherData(String city, int day) async {
+    final urlWeatherData =
+        'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$city';
     if (kDebugMode) {
-      print("Get URL From: $url");
+      print("Get urlWeatherData From: $urlWeatherData");
     }
-    await fetchWeatherDataFromUrl(url);
+    await fetchWeatherDataFromUrl(urlWeatherData, day);
   }
 
   Future<List<ForecastDay>> fetchWeatherForecast(String city, int days) async {
-    final url =
+    final urlForecastWeather =
         "http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$city&days=$days&aqi=no&alerts=no";
     if (kDebugMode) {
-      print("Get URL From: $url");
+      print("Get urlForecastWeather From: $urlForecastWeather");
     }
 
     try {
-      final response = await http.get(Uri.parse(url));
-
+      final response = await http.get(Uri.parse(urlForecastWeather));
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
 
@@ -135,28 +134,32 @@ class WeatherProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<ForecastDay>> fetchHistoryWeather(
+  Future<List<HistoryModel>> fetchHistoryWeather(
       String city, DateTime date) async {
-    final url =
+    final urlHistory =
         "http://api.weatherapi.com/v1/history.json?key=$apiKey&q=$city&dt=${date.toIso8601String().split('T').first}";
     if (kDebugMode) {
-      print("Get URL From: $url");
+      print("Get urlHistory From: $urlHistory");
     }
 
     try {
-      final response = await http.get(Uri.parse(url));
-
+      final response = await http.get(Uri.parse(urlHistory));
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        List<dynamic> daysList = data['forecast']['forecastday'];
-        List<ForecastDay> historyDays =
-            daysList.map((d) => ForecastDay.fromJson(d)).toList();
-        return historyDays;
+        final List<dynamic> daysList =
+            data['forecast']['forecastday'][0]['hour'];
+        List<HistoryModel> historyModels =
+            daysList.map((hour) => HistoryModel.fromJson(hour)).toList();
+        //historyDays = historyModels;
+        return historyModels;
       } else {
-        throw Exception("Failed to load weather data");
+        throw Exception("Failed to load historical weather data");
       }
     } catch (e) {
-      throw Exception("Failed to load weather data");
+      if (kDebugMode) {
+        print(e);
+      }
+      throw Exception("Error fetching historical weather data");
     }
   }
 
@@ -170,4 +173,56 @@ class WeatherProvider extends ChangeNotifier {
       }
     }
   }
+
+  Future<void> saveDataToCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String id = await getDeviceID();
+    await prefs.setString("device_id", id);
+    if (kDebugMode) {
+      print("Current user ID is: $id");
+    }
+  }
+
+  Future<String> getDeviceID() async {
+    final DeviceInfoPlugin deviceID = DeviceInfoPlugin();
+    String? id;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final AndroidDeviceInfo androidID = await deviceID.androidInfo;
+      id = androidID.id;
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final IosDeviceInfo iosID = await deviceID.iosInfo;
+      id = iosID.identifierForVendor ?? "";
+    } else {
+      var uuid = const Uuid();
+      id = uuid.v4();
+    }
+    return id;
+  }
+
+/*  Future<void> saveWeatherDataToDatabase(String cityName, String temperature,
+      String wind, String humidity, String status, String iconUrl) async {
+    try {
+      final deviceId = await getDeviceID();
+      final database = FirebaseFirestore.instance;
+
+      final historyWeatherDatabase =
+          database.collection("weatherHistoryData").doc(deviceId);
+      await historyWeatherDatabase.set({
+        "city": cityName,
+        "temperature": temperature,
+        "wind": wind,
+        "humidity": humidity,
+        "status": status,
+        "iconUrl": iconUrl,
+      });
+
+      if (kDebugMode) {
+        print("Save weather data to History Successfully");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error when saving data to FireStore: $e");
+      }
+    }
+  }*/
 }

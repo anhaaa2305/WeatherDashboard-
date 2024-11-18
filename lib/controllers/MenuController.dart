@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 class CustomMenuController extends ChangeNotifier {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<ScaffoldState> _gridScaffoldKey = GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _addProductScaffoldKey =
-  GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _ordersScaffoldKey =
-  GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _weatherScaffoldKey =
+      GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _dashboardScaffoldKey =
+      GlobalKey<ScaffoldState>();
   // Getters
   GlobalKey<ScaffoldState> get getScaffoldKey => _scaffoldKey;
   GlobalKey<ScaffoldState> get getgridscaffoldKey => _gridScaffoldKey;
-  GlobalKey<ScaffoldState> get getAddProductscaffoldKey =>
-      _addProductScaffoldKey;
-  GlobalKey<ScaffoldState> get getOrdersScaffoldKey => _ordersScaffoldKey;
+  GlobalKey<ScaffoldState> get getWeatherScaffoldKey => _weatherScaffoldKey;
+  GlobalKey<ScaffoldState> get getDashboardScaffoldKey => _dashboardScaffoldKey;
   // Callbacks
   void controlDashboarkMenu() {
     if (!_scaffoldKey.currentState!.isDrawerOpen) {
@@ -20,21 +19,21 @@ class CustomMenuController extends ChangeNotifier {
     }
   }
 
-  void controlProductsMenu() {
+  void controlHistoryMenu() {
     if (!_gridScaffoldKey.currentState!.isDrawerOpen) {
       _gridScaffoldKey.currentState!.openDrawer();
     }
   }
 
-  void controlAddProductsMenu() {
-    if (!_addProductScaffoldKey.currentState!.isDrawerOpen) {
-      _addProductScaffoldKey.currentState!.openDrawer();
+  void controlNotificationMenu() {
+    if (!_weatherScaffoldKey.currentState!.isDrawerOpen) {
+      _weatherScaffoldKey.currentState!.openDrawer();
     }
   }
 
-  void controlAllOrder() {
-    if (!_ordersScaffoldKey.currentState!.isDrawerOpen) {
-      _ordersScaffoldKey.currentState!.openDrawer();
+  void controlDashBoardWeather() {
+    if (!_dashboardScaffoldKey.currentState!.isDrawerOpen) {
+      _dashboardScaffoldKey.currentState!.openDrawer();
     }
   }
 }
