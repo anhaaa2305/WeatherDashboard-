@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_dashboard/models/history_forecast_model.dart';
 
 import '../controllers/MenuController.dart';
-import '../models/forecast_model.dart';
 import '../providers/weather_provider.dart';
 import '../responsive.dart';
 import '../services/utils.dart';
 import '../widgets/header.dart';
 import '../widgets/history_grid_weathers.dart';
 import '../widgets/side_menu.dart';
+import '../widgets/text_widget.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -37,9 +39,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final color = Utils(context).color;
     Size size = Utils(context).getScreenSize;
     final weatherProvider = Provider.of<WeatherProvider>(context);
-
     return Scaffold(
       key: context.read<CustomMenuController>().getgridscaffoldKey,
       drawer: const SideMenu(),
@@ -54,24 +56,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: TextWidget(
+                        text:
+                            "${weatherProvider.cityName} (${DateFormat('yyyy-MM-dd').format(weatherProvider.date)})",
+                        color: color,
+                        isTitle: true,
+                      ),
+                    ),
                     Header(
                       title: "Weather History",
                       fct: () {
                         context
                             .read<CustomMenuController>()
-                            .controlProductsMenu();
+                            .controlHistoryMenu();
                       },
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     ElevatedButton(
                       onPressed: () => _selectDate(context),
                       child: Text("Select Date: ${selectedDate.toLocal()}"
                           .split(' ')[0]),
                     ),
                     const SizedBox(height: 10),
-                    FutureBuilder<List<ForecastDay>>(
+                    FutureBuilder<List<HistoryModel>>(
                       future: weatherProvider.fetchHistoryWeather(
-                          "Ho Chi Minh", selectedDate),
+                          weatherProvider.cityName, selectedDate),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -93,7 +104,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       ? 1.1
                                       : 0.8,
                               isInMain: false,
-                              city: "Ho Chi Minh",
+                              city: weatherProvider.cityName,
+                              dateTime: selectedDate,
                             ),
                             desktop: HistoryGridWeathers(
                               crossAxisCount: size.width < 650 ? 2 : 4,
@@ -102,7 +114,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       ? 1.1
                                       : 0.8,
                               isInMain: false,
-                              city: "Ho Chi Minh",
+                              city: weatherProvider.cityName,
+                              dateTime: selectedDate,
                             ),
                           );
                         }

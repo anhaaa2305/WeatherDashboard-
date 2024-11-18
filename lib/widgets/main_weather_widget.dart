@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_dashboard/widgets/text_widget.dart';
@@ -13,21 +14,24 @@ class MainWeatherWidget extends StatefulWidget {
 
 class _MainWeatherWidgetState extends State<MainWeatherWidget> {
   WeatherProvider? weatherProvider;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     Provider.of<WeatherProvider>(context, listen: false)
-        .fetchWeatherData('Ho Chi Minh');
+        .fetchWeatherData('Ha Noi', 4);
   }
 
   @override
   Widget build(BuildContext context) {
     final weatherProvider = Provider.of<WeatherProvider>(context);
+
     return Row(
       children: [
         Expanded(
           child: Container(
+            width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.blueAccent,
@@ -58,11 +62,16 @@ class _MainWeatherWidgetState extends State<MainWeatherWidget> {
                   ],
                 ),
                 Column(
+                  //crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    weatherProvider.iconUrl != ""
-                        ? Image.network(weatherProvider.iconUrl)
-                        : Image.network(
-                            "https://www.stellarphotorecoverysoftware.com/blog/wp-content/uploads/2015/10/error-803716_1280.png"),
+                    CachedNetworkImage(
+                      imageUrl:
+                          "https:${weatherProvider.iconUrl}", // Replace with your image URL
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
                     const SizedBox(height: 8),
                     TextWidget(
                         text: weatherProvider.status, color: Colors.white),

@@ -11,12 +11,14 @@ class WeatherGrid extends StatelessWidget {
       required this.city,
       this.crossAxisCount = 4,
       this.childAspectRatio = 1,
-      this.isInMain = true});
+      this.isInMain = true,
+      required this.displayCount});
 
   final int crossAxisCount;
   final double childAspectRatio;
   final bool isInMain;
   final String city;
+  final int displayCount;
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +28,7 @@ class WeatherGrid extends StatelessWidget {
         : GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: isInMain && weatherProvider.forecastDays.length > 4
-                ? 4
-                : weatherProvider.forecastDays.length,
+            itemCount: weatherProvider.forecastDays.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
               childAspectRatio: childAspectRatio,
@@ -42,7 +42,7 @@ class WeatherGrid extends StatelessWidget {
                 temp: forecast.temperature,
                 wind: forecast.wind,
                 humidity: forecast.humidity,
-                icon: forecast.iconUrl,
+                image: "https:${forecast.iconUrl}",
               );
             },
           );

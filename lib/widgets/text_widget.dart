@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,10 +9,11 @@ class TextWidget extends StatelessWidget {
     super.key,
     required this.text,
     required this.color,
-    this.textSize = 16,
-    this.maxLines = 10,
+    double? textSize,
+    this.maxLines = 5,
     this.isTitle = false,
-  });
+  }) : textSize = textSize ??
+            (kIsWeb || !(Platform.isAndroid || Platform.isIOS) ? 16 : 12);
   final String text;
   final Color color;
   final double textSize;
